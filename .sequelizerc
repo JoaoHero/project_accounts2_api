@@ -1,0 +1,10 @@
+// Incluir módulo para gerenciar diretórios e caminho
+const path = require('path');
+
+// Indicar o local dos diretórios relacionado ao banco de dados
+module.exports = {
+  'config': path.resolve('db', "config", 'config.js'),
+  'models-path': path.resolve('db', 'models'),
+  'seeders-path': path.resolve('db', 'seeders'),
+  'migrations-path': path.resolve('db', 'migrations')
+};
