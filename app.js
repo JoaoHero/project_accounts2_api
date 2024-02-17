@@ -8,6 +8,10 @@ port = 8080
 // Importando as controllers
 loginRouter = require("./controllers/login")
 
+// Middlewares
+app.use(express.json())
+
+// Rotas
 app.use("/", loginRouter);
 
 // Servidor rodando na porta: localhost:8080

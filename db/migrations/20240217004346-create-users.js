@@ -10,16 +10,24 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       name: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       email: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
+      password: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       cpf: {
+        allowNull: false,
         type: Sequelize.STRING
       },
-      validatedEmail: {
-        type: Sequelize.STRING
+      validationCode: {
+        allowNull: false,
+        type: Sequelize.STRING(8),
       },
       createdAt: {
         allowNull: false,
@@ -31,7 +39,7 @@ module.exports = {
       }
     });
   },
-  async down(queryInterface, Sequelize) {
+  async down(queryInterface) {
     await queryInterface.dropTable('Users');
   }
 };
