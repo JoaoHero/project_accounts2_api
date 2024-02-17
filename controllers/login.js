@@ -43,7 +43,9 @@ router.post("/login", async(req, res) => {
             });
         };
 
-        if(user.validationCode === "validated") {
+        // Verificar se o e-mail já foi validado
+        if(user.validationCode !== "validated") {
+            // Parar o processamento e retornar o código de erro
             return res.status(404).json({
                 error: true,
                 message: "Necessário validar o E-mail"
