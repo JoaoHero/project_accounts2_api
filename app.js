@@ -6,8 +6,9 @@ app = express();
 port = 8080
 
 // Importando as controllers
-loginRouter = require("./controllers/login")
-registerRouter = require("./controllers/register")
+loginRouter = require("./controllers/login");
+registerRouter = require("./controllers/register");
+confirmEmailRouter = require("./controllers/validateEmail");
 
 // Middlewares
 app.use(express.json())
@@ -15,6 +16,7 @@ app.use(express.json())
 // Rotas
 app.use("/", loginRouter);
 app.use("/", registerRouter);
+app.use("/", confirmEmailRouter);
 
 // Servidor rodando na porta: localhost:8080
 app.listen(port, () => {
