@@ -20,7 +20,7 @@ router.post("/register", async(req, res) => {
     // Validando se foi informado todos os campos
     if(!user.name || !user.email || !user.password || !user.cpf) {
         return res.status(404).json({
-            error: false,
+            error: true,
             message: "Todos os dados são obrigatórios!"
         });
     };
