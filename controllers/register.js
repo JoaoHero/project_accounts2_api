@@ -6,7 +6,8 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const saltRounds = 10; // Define o número de rounds de salt (geralmente entre 10 e 12)
 
-const generateEmailCode = require("../utils/generateCode")
+const generateEmailCode = require("../utils/generateCode");
+const sendEmail = require("../utils/sendEmail");
 
 // Importando a conexão com banco de dados
 const db = require("../db/models");
@@ -48,6 +49,8 @@ router.post("/register", async(req, res) => {
 
     // Criando o usuário no banco de dados
     await db.Users.create(user);
+
+    sendEmail(user.email);
 
     // Parar o processamento e retornar um código de sucesso
     return res.status(201).json({
