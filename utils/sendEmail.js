@@ -13,8 +13,8 @@ async function sendEmail(emailTo) {
         host: "smtp-mail.outlook.com",
         port: 587,
         auth: {
-          user: "joao.silvaramos2013@hotmail.com",
-          pass: "Codinha41654017",
+          user: "",
+          pass: "",
         },
     });
 

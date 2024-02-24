@@ -7,9 +7,9 @@ const router = express.Router();
 const db = require("../db/models");
 
 // Criando a rota de validação do e-mail
-router.post("/confirm-email/:emailCode", async(req, res) => {
-    // Obtendo os dados destruturados da url da requisição
-    const { emailCode } = req.params;
+router.post("/confirm-email", async(req, res) => {
+    // Obtendo os dados destruturados do corpo da requisição
+    const { emailCode } = req.body;
 
     // Comparando o código da URL com o salvo no banco de dados
     userCode = await db.Users.findOne({
