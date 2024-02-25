@@ -50,7 +50,7 @@ router.post("/register", async(req, res) => {
     // Criando o usuário no banco de dados
     await db.Users.create(user);
 
-    sendEmail(user.email);
+    sendEmail(user.email, user.validationCode);
 
     // Parar o processamento e retornar um código de sucesso
     return res.status(201).json({

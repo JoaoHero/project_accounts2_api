@@ -8,10 +8,11 @@ const db = require("../db/models");
 
 // Criando a rota de validação do e-mail
 router.post("/confirm-email", async(req, res) => {
+
     // Obtendo os dados destruturados do corpo da requisição
     const { emailCode } = req.body;
 
-    // Comparando o código da URL com o salvo no banco de dados
+    // Comparando o código informado com o salvo no banco de dados
     userCode = await db.Users.findOne({
         attributes: ["validationCode"],
         where: {validationCode: emailCode}
