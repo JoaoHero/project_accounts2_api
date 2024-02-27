@@ -4,6 +4,8 @@ const express = require('express');
 const router = express.Router();
 // Importando o modulo de hash de senhas
 const bcrypt = require('bcrypt');
+// Importando o modulo JsonWebToken
+const jwt = require("jsonwebtoken");
 
 // Importando a conexão com banco de dados
 const db = require("../db/models");
@@ -18,7 +20,7 @@ router.post("/login", async(req, res) => {
 
         // Buscando o e-mail no banco de dados e comparando com o que foi informado na requisição
         const user = await db.Users.findOne({
-            attributes: ["email", "password", "validationCode"],
+            attributes: ["id", "name", "email", "password", "validationCode"],
             where: { email: email }
         });
 
@@ -52,10 +54,15 @@ router.post("/login", async(req, res) => {
             });
         };
 
+        let token = jwt.sign({id: user.id, name: user.name}, "ATROS190KHSGZXCVWERGHXQGY", {
+            expiresIn: 600 // 10 minutos
+        });
+
         // Parar o processamento e retornar o código de sucesso
         return res.status(200).json({
             error: false,
-            message: "Usuário encontrado, logando..."
+            message: "Login realizado com sucesso!",
+            token
         });
 
     // Capturar erro no try catch
