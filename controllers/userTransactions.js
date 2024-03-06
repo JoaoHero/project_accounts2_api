@@ -249,4 +249,90 @@ router.post("/userTransactions/pix", eAdmin, async(req, res) => {
     };
 });
 
+// Criando rota de pagar
+router.post("/userTransactions/pay", eAdmin, async(req, res) => {
+
+    try {
+        //  Obtendo o id do usuário que solicitou a requisição
+        const userID = req.user.id;
+        //  Obtendo o valor da fatura pela requisição
+        const { value } = req.body;
+
+        // Validar se todos os campos foram preenchidos
+        if(!value) {
+            // Parar o processamento e retornar o código de erro
+            return res.status(404).json({
+                error: true,
+                message: "Necessário informar o valor da fatura"
+            });
+        };
+
+        // Validar se o valor informado para o pix não é um valor negativo
+        if(value < 0) {
+            // Parar o processamento e retornar o código de erro
+            return res.status(400).json({
+                error: true,
+                message: "Número negativos não são permitidos!"
+            });
+        };
+
+        // Validando se o tipo do dado em value inserido é um número ou string
+        if(typeof value != "number") {
+            // Parar o processamento e retornar o código de erro
+            return res.status(400).json({
+                error: true,
+                message: "Enviar apenas números!!"
+            });
+        }else {
+
+            const userBalance = await db.Users.findOne({
+                attributes: ["balance"],
+                where: { id: userID }
+            });
+
+            let { balance } = userBalance.dataValues
+
+            // Validando se o valor inserido ao pix não é maior do que o saldo em conta
+            if(value > balance) {
+                // Parar o processamento e retornar o código de erro
+                return res.status(400).json({
+                    error: true,
+                    message: "Saldo insuficitente para completar a solicitação"
+                });
+            };
+
+            // Operação do novo saldo do usuário que está solicitando a transação
+            const newBalance = balance - value
+
+            const update = await db.Users.update(
+                { balance: newBalance },
+                { where: { id: userID }}
+            );
+
+            // Validando se houve alteração no banco de dados
+            if(update != 0 ) {
+                // Parar o processamento e retornar o código de sucesso
+                return res.status(200).json({
+                    error: false,
+                    message: "Pagamento realizado com sucesso."
+                });
+            }else {
+                // Parar o processamento e retornar o código de erro
+                return res.status(404).json({
+                    error: true,
+                    message: "Não foi possível realizar o seu pagamento."
+                });
+            };
+        };
+
+    }catch(err) {
+        console.error("Erro ao tentar fazer o pix, erro:", err);
+        // Parar o processamento e retornar o código de erro
+        return res.status(500).json({
+            error: true,
+            message: "Erro ao tentar efetuar o pagamento da sua conta. Tente novamente mais tarde.",
+        });
+    };
+});
+
 module.exports = router;
