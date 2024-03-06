@@ -284,7 +284,7 @@ router.post("/userTransactions/pay", eAdmin, async(req, res) => {
                 message: "Enviar apenas números!!"
             });
         }else {
-
+            // Buscando o saldo do usuário no banco de dados
             const userBalance = await db.Users.findOne({
                 attributes: ["balance"],
                 where: { id: userID }
@@ -325,6 +325,93 @@ router.post("/userTransactions/pay", eAdmin, async(req, res) => {
             };
         };
 
+    }catch(err) {
+        console.error("Erro ao tentar fazer o pix, erro:", err);
+        // Parar o processamento e retornar o código de erro
+        return res.status(500).json({
+            error: true,
+            message: "Erro ao tentar efetuar o pagamento da sua conta. Tente novamente mais tarde.",
+        });
+    };
+});
+
+// Criando a rota de empréstimo
+router.post("/userTransactions/loan", eAdmin, async(req, res) => {
+
+    try {
+        //  Obtendo o id do usuário que solicitou a requisição
+        const userID = req.user.id;
+        //  Obtendo o valor do empréstimo pela requisição
+        const { value } = req.body;
+        // Setando o limite do empréstimo
+        const limitLoan = 10000
+
+        // Validar se todos os campos foram preenchidos
+        if(!value) {
+            // Parar o processamento e retornar o código de erro
+            return res.status(404).json({
+                error: true,
+                message: "Necessário informar o valor da fatura"
+            });
+        };
+
+        // Validar se o valor informado para o empréstimo não é um valor negativo
+        if(value < 0) {
+            // Parar o processamento e retornar o código de erro
+            return res.status(400).json({
+                error: true,
+                message: "Número negativos não são permitidos!"
+            });
+        };
+
+        // Validando se o tipo do dado em value inserido é um número ou string
+        if(typeof value != "number") {
+            // Parar o processamento e retornar o código de erro
+            return res.status(400).json({
+                error: true,
+                message: "Enviar apenas números!!"
+            });
+        }else {
+            // Validando se o valor informado para o empréstimo não é maior do que o limite estabelecido
+            if(value > limitLoan) {
+                // Parar o processamento e retornar o código de erro
+                return res.status(400).json({
+                    error: true,
+                    message: "Valor do limite máximo de empréstimo ultrapassado!"
+                });
+            };
+
+            // Buscando o saldo do usuário no banco de dados
+            const userBalance = await db.Users.findOne({
+                attributes: ["balance"],
+                where: { id: userID }
+            });
+
+            // Atribuindo o saldo do usuário a uma variável
+            let { balance } = userBalance.dataValues;
+
+            const newBalance = balance + value;
+
+            const update = await db.Users.update(
+                { balance: newBalance },
+                {where: { id: userID }}
+            );
+
+            // Validando se houve alteração no banco de dados
+            if(update != 0 ) {
+                // Parar o processamento e retornar o código de sucesso
+                return res.status(200).json({
+                    error: false,
+                    message: "Empréstimo realizado com sucesso."
+                });
+            }else {
+                // Parar o processamento e retornar o código de erro
+                return res.status(404).json({
+                    error: true,
+                    message: "Não foi possível realizar o seu empréstimo."
+                });
+            };
+        };
     }catch(err) {
         console.error("Erro ao tentar fazer o pix, erro:", err);
         // Parar o processamento e retornar o código de erro
