@@ -54,16 +54,32 @@ router.get("/userTransactions", eAdmin, async(req, res) => {
 });
 
 
-// Criando rota para deposito do usuário
+// Criando rota para depósito do usuário
 router.post("/userTransactions/deposit", eAdmin, async(req, res) => {
     try {
         // Obtendo o id do usuário pelo token
         const userId = req.user.id;
         // Capturando o valor de depósito enviado pelo corpo da requisição
-        let { depositValue } = req.body;
+        let { value } = req.body;
+
+        if(!value) {
+            // Parar o processamento e retornar o código de erro
+            return res.status(400).json({
+                error: true,
+                message: "é necessário informar um valor!"
+            });
+        };
+
+        if(value < 0) {
+            // Parar o processamento e retornar o código de erro
+            return res.status(400).json({
+                error: true,
+                message: "Número negativos não são permitidos!"
+            });
+        };
 
         // Validando se o tipo de dado inserido é um número ou string
-        if(typeof depositValue != "number") {
+        if(typeof value != "number") {
             // Parar o processamento e retornar o código de erro
             return res.status(400).json({
                 error: true,
@@ -80,7 +96,7 @@ router.post("/userTransactions/deposit", eAdmin, async(req, res) => {
             // Atribuindo o saldo do usuário a nova variável
             const { balance } = userBalance.dataValues;
             // Realizando a soma do saldo em conta mais o valor novo
-            const newBalance = balance + depositValue;
+            const newBalance = balance + value;
 
             // Atualizando o campo do saldo no banco de dados
             const update = await db.Users.update(
