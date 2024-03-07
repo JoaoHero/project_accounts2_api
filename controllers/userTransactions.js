@@ -203,6 +203,7 @@ router.post("/userTransactions/pix", eAdmin, async(req, res) => {
 
             // Salvando o SALDO do usuário que será enviado o pix em uma variável
             const accountPixBalance = accountPix.dataValues.balance;
+
             // Salvando o ID do usuário que será enviado o pix em uma variável
             const accountPixId = accountPix.dataValues.id;
 
@@ -211,6 +212,15 @@ router.post("/userTransactions/pix", eAdmin, async(req, res) => {
 
             // Operação do novo saldo para conta do usuário que irá o pix
             const newAccountPixBalance = accountPixBalance + value;
+
+            // Validando se o usuário não está tentando enviar o pix para a própria conta
+            if(accountPixId === userId) {
+                // Parar o processamento e retornar o código de erro
+                return res.status(400).json({
+                    error: true,
+                    message: "Não é possível enviar o pix para própria conta!"
+                });
+            };
 
             // Realizando a atualização do novo saldo do usuário que solicitou a transação
             let update = await db.Users.update(
@@ -351,7 +361,7 @@ router.post("/userTransactions/loan", eAdmin, async(req, res) => {
             // Parar o processamento e retornar o código de erro
             return res.status(404).json({
                 error: true,
-                message: "Necessário informar o valor da fatura"
+                message: "Necessário informar a quantia de dinheiro desejada para o empréstimo"
             });
         };
 
@@ -413,11 +423,11 @@ router.post("/userTransactions/loan", eAdmin, async(req, res) => {
             };
         };
     }catch(err) {
-        console.error("Erro ao tentar fazer o pix, erro:", err);
+        console.error("Erro ao tentar fazer o empréstimo, erro:", err);
         // Parar o processamento e retornar o código de erro
         return res.status(500).json({
             error: true,
-            message: "Erro ao tentar efetuar o pagamento da sua conta. Tente novamente mais tarde.",
+            message: "Erro ao tentar realizar o empréstimo. Tente novamente mais tarde.",
         });
     };
 });
