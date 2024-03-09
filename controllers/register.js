@@ -94,7 +94,6 @@ router.post("/register", async(req, res) => {
     user.password = await bcrypt.hash(user.password, saltRounds);
     // Gerar um código de acesso e salvar no banco de dados para comparar
     user.validationCode = generateEmailCode();
-    // Enviar o e-mail contendo a URL da rota e o código de acesso
 
     // Criando o usuário no banco de dados
     await db.Users.create(user);
